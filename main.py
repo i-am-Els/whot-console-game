@@ -1,7 +1,7 @@
 import random
 
 
-class Cards:
+class Cards: # The card object is defined here
     def __init__(self):
         self.market = []
         self.marketClone = [] # Constant
@@ -10,37 +10,37 @@ class Cards:
     
     def create_deck(self):
         self.deck = []
-        for i in range(5):
+        for _ in range(5):
             self.shape_list = []
             self.exception = [0, 6, 9, 15, 16, 17, 18, 19]
             for j in range(21):
                 if j in self.exception:
                     pass
                 else:
-                    self.shape_list.append(j)
-            self.deck.append(self.shape_list)
-        return self.deck
+                    self.shape_list.append(j) # Adds the list of valid numbers for a whot game to the shapes list
+            self.deck.append(self.shape_list) # Appending all five to a parent list called deck
+        return self.deck # return deck upon call 
 
     def print_deck(self):
         print(self.deck)
     
     def gen_market(self):
-        self.shape_name = ["Circles", "Cross", "Triangle", "Rectangle", "Star"]
+        self.shape_name = ["Circles", "Cross", "Triangle", "Rectangle", "Star"] # An initialization of all the shape names
         for y in range(len(self.deck)):
             for z in self.deck[y]:
-                self.market.append(self.shape_name[y] + str(z))
-                self.marketClone.append(self.shape_name[y] + str(z))
+                self.market.append(self.shape_name[y] + str(z)) # This creates the list of all the cards with thee shape name appended to the beginning e.g Circle10
+                self.marketClone.append(self.shape_name[y] + str(z)) # Stores a duplicate of the above step in another list
         return self.market, self.marketClone
 
     def shuffle_market(self):
-        random.shuffle(self.market)
+        random.shuffle(self.market) # Shuffles Market... Market is the list containing all the card deck
         return self.market
 
-    def assign_firstCard(self):
-        randomInt = random.randint(0, (len(self.market) - 1))
-        self.CommitCard = self.market[randomInt]
-        self.market.pop(randomInt)
-        self.CommitList.append(self.CommitCard)
+    def assign_firstCard(self): # This method assigns the initial card that decides what the first player is to play
+        randomInt = random.randint(0, (len(self.market) - 1)) # Generate a random int between O and the number of cards in the market
+        self.CommitCard = self.market[randomInt] # Picks the card at the randompositionn deduced earlier and stores it in the commit variacble
+        self.market.pop(randomInt) # This card cannot exist twice so since it is already in commit, it is removed from market.
+        self.CommitList.append(self.CommitCard) # This list stores all the commits i.e all played cards but it is initially empty and now we add commit into it
         return self.CommitCard
 
     def print_market(self):
@@ -50,47 +50,34 @@ class Cards:
     def tender(self, gameObj):
         lenOfCards = []
         add = 0
-        for i in range(gameObj.numOfPlayers):
-            for j in gameObj.newPlayerList[i].playerCards:
-                testSum = gameObj.newPlayerList[i].check_for_digit(j)
-                add += testSum
-            lenOfCards.append(add)
-        smallest = 0
-        smallestIndex = 0
-        extra = 0
-        extraIndex = 0
-        for k in lenOfCards:
-            for l in lenOfCards:
-                if lenOfCards.index(l) == lenOfCards.index(k):
-                    pass
-                else:
-                    if k < l:
-                        smallest = k
-                        smallestIndex = lenOfCards.index(k)
-                    elif k == l:
-                        smallest, extra = k, l
-                        smallestIndex, extraIndex = lenOfCards.index(k), lenOfCards.index(l)
+        for i in range(gameObj.numOfPlayers): # Loop through the list of players and select theindex of each player
+            for j in gameObj.newPlayerList[i].playerCards: # For each player access the list containing their unplayed cards
+                testSum = gameObj.newPlayerList[i].check_for_digit(j) # Pick the numeric values from all the cards
+                add += testSum # sum those numeric values
+            lenOfCards.append(add) # store the numeric sums of cards for all players in List called lenOfCards 
         
-        if extra == 0:
-            print("Ran out of market, Winner upon tender is", gameObj.newPlayerList[smallestIndex].alias)
-        else:
-            print("Ran out of market, Winners upon tender are", gameObj.newPlayerList[smallestIndex].alias, "and", gameObj.newPlayerList[extraIndex].alias)
-        raise SystemExit("The End... Quiting game!!!")
+        smallest = lenOfCards[0] # Set the first element of the list as the smallest
+        j = len(lenOfCards) 
+        for l in range(1, j): # loop through the rest of the other players
+            if smallest > lenOfCards[l]: # Compare the smallest element with the present element
+                smallest = lenOfCards[l] # store the new smallest value in smallest
+        smallestIndex = lenOfCards.index(smallest) # Select the index of the overall smallest element and store in smallestIndex
+        
+        print("Ran out of market, Winner upon tender is", gameObj.newPlayerList[smallestIndex].alias) # Declare the winner upon tender
+        raise SystemExit("The End... Quiting game!!!") # quit the game
 
-    def goto_market(self, playerObj):
-        if len(self.market) > 0:
-            playerObj.playerCards.append(self.market[0])
-            playerObj.playerCardsIndex = playerObj.stack_index(self)
-            self.market.pop(0)
-        else:
-            self.tender(gameloop)
-        #playerObj.print_playerDetails()
-        return playerObj.playerCards
-        return playerObj.playerCardsIndex
+    def goto_market(self, playerObj): # An option for player to pick a card if non of its cards matches commit. 
+        if len(self.market) > 0: # This can only be done when market is not empty 
+            playerObj.playerCards.append(self.market[0]) # Append the first card in market to the players card list
+            playerObj.playerCardsIndex = playerObj.stack_index(self) # Go to the PlayerClass and execute stack_index which refreshes list of indices of all player cards and store it in this variable 
+            self.market.pop(0) # Remove the card selected away from market
+        else: # This means market is empty
+            self.tender(gameloop) # We choose to tender our cards then... call tender method.
+        return playerObj.playerCards, playerObj.playerCardsIndex
 
 
-class Player:
-    def __init__(self):
+class Player: # Defines the Players behaviors and characteristics
+    def __init__(self): # Initializing the different characteristics of the player object
         self.playerCards = []
         self.playerCardsIndex = []
         self.name = ''
@@ -109,7 +96,7 @@ class Player:
 
     def create_stack(self, cardObj):
         print(self.alias)
-        for i in range(5):
+        for _ in range(5):
             randomNum = random.randint(0, (len(cardObj.market) - 1))
             self.playerCards.append(cardObj.market[randomNum])
             cardObj.market.pop(randomNum)
@@ -242,67 +229,19 @@ class Gameplay:
         print(self.newRoundGuide)
 
     def hold_on(self, runIndex, playerObj, cardObj):
-        if runIndex == 0:
-            runIndex = self.numOfaiPlayers
-        else:
-            runIndex -= 1
-        print(f"Hold on | Sorry, {self.newPlayerList[runIndex].alias} gets to play | It will be the next players turn sooner...")
-        initialCardLength = len(self.newPlayerList[runIndex].playerCards)
-        self.play(runIndex, cardObj)
-        newCardLength = len(self.newPlayerList[runIndex].playerCards)
-        visitedMarket = newCardLength > initialCardLength
-        if (playerObj.check_for_digit(cardObj.CommitCard) == 1) and (not(visitedMarket)):
-            if runIndex == self.numOfaiPlayers:
-                runIndex = 0
-                self.hold_on(runIndex, playerObj, cardObj)
-            else:
-                runIndex += 1
-                self.hold_on(runIndex, playerObj, cardObj)
-        else:
-            print("Next player can now play...")
+        pass
     
     def pick_two(self, playerObj, cardObj):
-        print(playerObj.alias, "picked 2")
-        for i in range(2):
-            cardObj.goto_market(playerObj)
+        pass
     
     def pick_three(self, playerObj, cardObj):
-        print(playerObj.alias, "picked 3")
-        for i in range(3):
-            cardObj.goto_market(playerObj)
+        pass
 
     def skip(self, runIndex, playerObj):
-        print(playerObj.alias, "skipped")
-        if runIndex < self.numOfaiPlayers:
-            runIndex += 1
-        else:
-            runIndex = 0
+        pass
 
     def general_market(self, runIndex, playerObj, cardObj):
-        print("General Market >>>|<<<")
-        if runIndex == 0:
-            runIndex = self.numOfaiPlayers
-        else:
-            runIndex -= 1
-        for i in range(self.numOfPlayers):
-            if runIndex == i:
-                pass
-            else:
-                cardObj.goto_market(self.newPlayerList[i])
-        print(f"General Market | Now, {self.newPlayerList[runIndex].alias} should play...")
-        initialCardLength = len(self.newPlayerList[runIndex].playerCards)
-        self.play(runIndex, cardObj)
-        newCardLength = len(self.newPlayerList[runIndex].playerCards)
-        visitedMarket = newCardLength > initialCardLength
-        if (playerObj.check_for_digit(cardObj.CommitCard) == 14) and (not(visitedMarket)):
-            if runIndex == self.numOfaiPlayers:
-                runIndex = 0
-                self.general_market(runIndex, playerObj, cardObj)
-            else:
-                runIndex += 1
-                self.general_market(runIndex, playerObj, cardObj)
-        else:
-            print("Next player can go ahead and play...")
+        pass
 
     def card_test(self, runIndex, playerObj, cardObj):
         self.testcase = playerObj.check_for_digit(cardObj.CommitCard)
