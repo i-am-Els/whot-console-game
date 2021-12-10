@@ -86,7 +86,9 @@ class Player: # Defines the Players behaviors and characteristics
         self.chosenIndex = 0 # Stores the index of the card the player wish to commit 
         self.chosenCard = '' # the card identifier that the player wants to commit
         self.cardDigit = 0 # The digit of the card that the player wants to commit 
-        self.commitDigit = 0 # The digit of the card that is in commit 
+        self.commitDigit = 0 # The digit of the card that is in commit
+        self.cardShape = '' # The shape of the card that the player wants to commit 
+        self.commitShape = '' # The shape of the card that is in commit 
 
 
     def create_profile(self): # creates a profile for the player
@@ -103,29 +105,35 @@ class Player: # Defines the Players behaviors and characteristics
         return self.playerCards # return the list of all of the current players cards
         
     def stack_index(self, cardObj): 
-        self.playerCardsIndex.clear()
-        for item in self.playerCards:
-            for obj in cardObj.marketClone:
-                if obj == item:
-                    self.cardIndex = cardObj.marketClone.index(obj)
-            self.playerCardsIndex.append(self.cardIndex)
+        self.playerCardsIndex.clear() # Clears Player Cards Indices list
+        for item in self.playerCards: # loop through all player cards
+            for obj in cardObj.marketClone: # Check through the constant clone of market
+                if obj == item: # confirm if the players cards are in market clone
+                    self.cardIndex = cardObj.marketClone.index(obj) # Then select the index of each card from market clone
+            self.playerCardsIndex.append(self.cardIndex) # Put those indices in a list
         return self.playerCardsIndex
 
-    def player_stack(self, cardObj):
-        self.create_stack(cardObj)
-        self.stack_index(cardObj)
+    def player_stack(self, cardObj): # Work on distribution of cards to players
+        self.create_stack(cardObj) # calls the method that creates card 
+        self.stack_index(cardObj) # calls the method that store the indices the cards created above
 
-    def print_playerDetails(self):
+    def print_playerDetails(self): # Prints player details
         print(self.alias)
         print(self.playerCards)
 
-    def check_for_digit(self, cardName):
-        num = ''
-        for item in cardName:
-            if item.isdigit():
-                num += item
-        cardNum = int(num)
-        return cardNum
+    def check_for_digit(self, cardName): # Finds numeric value is a Card identifier/name
+        num = '' # an empty string to capture the digits
+        for item in cardName: # in card name, loop through all characters
+            if item.isdigit(): # if item is a digit
+                num += item # append to num e.g Star21 => '2' + '1' = '21'
+        cardNum = int(num) # convert num to an integer and store it cardNum
+        return cardNum # return that integer
+
+    def check_for_shape(self, cardName): # checks for the name of the shape in the card name
+        for item in cardName: # in card name, loop through all characters
+            if item.isalpha() == True: # if item is a string
+                shape += item # add item to shape e.g Star21 => 'S' + 't' + 'a' + 'r' = 'Star'
+        return shape # return shape
 
     def card_selection(self, cardObj):
         self.print_playerDetails()
@@ -135,9 +143,11 @@ class Player: # Defines the Players behaviors and characteristics
     def commit_card(self, cardObj):
         self.card_selection(cardObj)
         self.chosenCard = self.playerCards[self.chosenIndex - 1]
+        self.cardShape = self.check_for_shape(self.chosenCard)
         self.cardDigit = self.check_for_digit(self.chosenCard)
+        self.commitShape = self.check_for_shape(cardObj.CommitCard)
         self.commitDigit = self.check_for_digit(cardObj.CommitCard)
-        conditions = (cardObj.CommitCard[:4] == self.chosenCard[:4]) or (self.commitDigit == 20) or (self.cardDigit == self.commitDigit) or (self.cardDigit == 20)
+        conditions = (self.commitShape == self.cardShape) or (self.commitDigit == 20) or (self.cardDigit == self.commitDigit) or (self.cardDigit == 20)
         if conditions and self.chosenIndex != 0:
             cardObj.CommitCard = self.chosenCard
             print(self.alias, "played", self.chosenCard)
