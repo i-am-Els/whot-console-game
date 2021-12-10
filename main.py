@@ -198,7 +198,7 @@ class AIPlayer(Player): # AI players special behavior and characteristics are de
 
 
 class Gameplay: # Game Manager
-    def __init__(self):
+    def __init__(self): 
         self.testcase = 0
         self.playerList = []
         self.numOfaiPlayers = 0
@@ -207,8 +207,6 @@ class Gameplay: # Game Manager
         self.firstPlayerIndex = 0
         self.winner = ''
         self.runGame = True
-        self.initialRoundGuide = 0
-        self.newRoundGuide = 1
 
     def num_ai(self):
             self.numOfaiPlayers = int(input("Choose Number of AI opponents | cannot be greater than 4>>> "))
@@ -229,15 +227,10 @@ class Gameplay: # Game Manager
         return self.firstPlayerIndex
 
     def play(self, runIndex, cardObj):
-        self.initialRoundGuide = len(cardObj.CommitList)
-        print(self.initialRoundGuide)
         if runIndex == 0:
             self.newPlayerList[runIndex].commit_card(cardObj)
         else:
-            self.newPlayerList[runIndex].ai_decision(cardObj)
-        self.newRoundGuide = len(cardObj.CommitList)
-        self.initialRoundGuide = self.newRoundGuide
-        print(self.newRoundGuide)
+            self.newPlayerList[runIndex].ai_decision(cardObj)  
 
     def hold_on(self, runIndex, playerObj, cardObj):
         pass
@@ -267,8 +260,7 @@ class Gameplay: # Game Manager
         elif self.testcase == 14:
             self.general_market(runIndex, playerObj, cardObj)
         else:
-            self.play(runIndex, cardObj)
-        
+            pass        
 
     def winner_test(self, playerObj):
         if len(playerObj.playerCards) == 0:
@@ -308,20 +300,17 @@ class Gameplay: # Game Manager
 
         self.select_first_player(c)
 
-        while self.runGame == True:
-            k = self.firstPlayerIndex
-            while (k < self.numOfPlayers) and (self.winner == ''):
-                #if self.newRoundGuide > self.initialRoundGuide:
-                self.card_test(k, self.newPlayerList[k], c)
-                #else:
-                #self.play(k, c)
-                self.winner_test(self.newPlayerList[k])
-                if k == self.numOfaiPlayers:
-                    k = 0
-                else:
-                    k += 1
-        else:
-            print(f"There is a winner already!: {self.winner}")
+        k = self.firstPlayerIndex
+        while (self.winner == '') and (self.runGame == True):
+            self.play(k, c)
+            self.card_test(k, self.newPlayerList[k], c)
+            self.winner_test(self.newPlayerList[k])
+            if k == self.numOfaiPlayers:
+                k = 0
+            else:
+                k += 1
+        
+        print(f"There is a winner already!: {self.winner}")
         
 
 if __name__ == '__main__':
