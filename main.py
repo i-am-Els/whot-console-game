@@ -78,31 +78,31 @@ class Cards: # The card object is defined here
 
 class Player: # Defines the Players behaviors and characteristics
     def __init__(self): # Initializing the different characteristics of the player object
-        self.playerCards = []
-        self.playerCardsIndex = []
-        self.name = ''
-        self.alias = ''
-        self.cardIndex = 0
-        self.chosenIndex = 0
-        self.chosenCard = ''
-        self.cardDigit = 0
-        self.commitDigit = 0
+        self.playerCards = [] # this contains the players cards 
+        self.playerCardsIndex = [] # this contains the list of the indicecs of this cards in the MarketClone(Constant market)
+        self.name = '' # The name of the Player Obj
+        self.alias = '' # The alias of the player obj
+        self.cardIndex = 0 # Used to store the index of a card
+        self.chosenIndex = 0 # Stores the index of the card the player wish to commit 
+        self.chosenCard = '' # the card identifier that the player wants to commit
+        self.cardDigit = 0 # The digit of the card that the player wants to commit 
+        self.commitDigit = 0 # The digit of the card that is in commit 
 
 
-    def create_profile(self):
-        self.name = input("Enter your alias(Avatar_name)>>> ")
-        self.alias = self.name[0].upper()
-        return self.alias
+    def create_profile(self): # creates a profile for the player
+        self.name = input("Enter your alias(Avatar_name)>>> ") # Asks input for Human players choice name
+        self.alias = self.name[0].upper() # Picks the first letter converts it to Uppercase and sets it as the alias
+        return self.alias 
 
-    def create_stack(self, cardObj):
+    def create_stack(self, cardObj): # create players cards
         print(self.alias)
-        for _ in range(5):
-            randomNum = random.randint(0, (len(cardObj.market) - 1))
-            self.playerCards.append(cardObj.market[randomNum])
-            cardObj.market.pop(randomNum)
-        return self.playerCards
+        for _ in range(5): # Create 5 cards for the player
+            randomNum = random.randint(0, (len(cardObj.market) - 1)) # pick randomly from market
+            self.playerCards.append(cardObj.market[randomNum]) # adds it to player cards list
+            cardObj.market.pop(randomNum) # removes the cards from market
+        return self.playerCards # return the list of all of the current players cards
         
-    def stack_index(self, cardObj):
+    def stack_index(self, cardObj): 
         self.playerCardsIndex.clear()
         for item in self.playerCards:
             for obj in cardObj.marketClone:
