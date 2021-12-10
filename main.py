@@ -3,10 +3,10 @@ import random
 
 class Cards: # The card object is defined here
     def __init__(self):
-        self.market = []
+        self.market = [] # Container for all cards
         self.marketClone = [] # Constant
-        self.CommitCard = ''
-        self.CommitList = []
+        self.CommitCard = '' # Last Played card
+        self.CommitList = [] # All played cards are stored here
     
     def create_deck(self):
         self.deck = []
@@ -135,68 +135,69 @@ class Player: # Defines the Players behaviors and characteristics
                 shape += item # add item to shape e.g Star21 => 'S' + 't' + 'a' + 'r' = 'Star'
         return shape # return shape
 
-    def card_selection(self, cardObj):
-        self.print_playerDetails()
-        print("\nThe presently committed card is", cardObj.CommitCard, "\n")
-        self.chosenIndex = int(input("Enter the order of the card you want to play, e.g if 1st enter 1 | Press 0 to go to Market>>> "))
+    def card_selection(self, cardObj): # Prompts player to play its card
+        self.print_playerDetails() #Prints the details of the one to play
+        print("\nThe presently committed card is", cardObj.CommitCard, "\n") # Informs player about the last played card(commit)
+        self.chosenIndex = int(input("Enter the order of the card you want to play, e.g if 1st enter 1 | Press 0 to go to Market>>> ")) # prompt to enter an input or go to market
 
-    def commit_card(self, cardObj):
-        self.card_selection(cardObj)
-        self.chosenCard = self.playerCards[self.chosenIndex - 1]
-        self.cardShape = self.check_for_shape(self.chosenCard)
-        self.cardDigit = self.check_for_digit(self.chosenCard)
-        self.commitShape = self.check_for_shape(cardObj.CommitCard)
-        self.commitDigit = self.check_for_digit(cardObj.CommitCard)
-        conditions = (self.commitShape == self.cardShape) or (self.commitDigit == 20) or (self.cardDigit == self.commitDigit) or (self.cardDigit == 20)
-        if conditions and self.chosenIndex != 0:
-            cardObj.CommitCard = self.chosenCard
-            print(self.alias, "played", self.chosenCard)
-            self.playerCards.pop(self.chosenIndex - 1)
-            self.playerCardsIndex.pop(self.chosenIndex - 1)
-            cardObj.CommitList.append(cardObj.CommitCard)
-        elif self.chosenIndex == 0:
-            cardObj.goto_market(self)
-            print(self.alias, "went to Market")
-        else:
-            print("Your card is not acceptable. Commit a valid card | Press 0 to Go to Market")
-            self.commit_card(cardObj)
-        return cardObj.CommitCard
+    def commit_card(self, cardObj): # Handles card validation
+        self.card_selection(cardObj) # calls the prompt for player to play a card
+        self.chosenCard = self.playerCards[self.chosenIndex - 1] # stores the chosen card in a container for validation
+        self.cardShape = self.check_for_shape(self.chosenCard) # Check for the shape of the card player played and store the shape for validattion
+        self.cardDigit = self.check_for_digit(self.chosenCard) # Check for the digit of the card player played and store the digit for validattion
+        self.commitShape = self.check_for_shape(cardObj.CommitCard) # Check for the shape of last played card
+        self.commitDigit = self.check_for_digit(cardObj.CommitCard) # Check for the digit of last played card
+        conditions = (self.commitShape == self.cardShape) or (self.commitDigit == 20) or (self.cardDigit == self.commitDigit) or (self.cardDigit == 20) # conditions for validation
+        if conditions and self.chosenIndex != 0: # If condition is met and player did not decide to pick a card from market
+            cardObj.CommitCard = self.chosenCard # Accept the card and make it the new last played card
+            print(self.alias, "played", self.chosenCard) # Inform all players about current players card choice
+            self.playerCards.pop(self.chosenIndex - 1) # Upon accepting the card from the user, remove it from the list of cards the player can play
+            self.playerCardsIndex.pop(self.chosenIndex - 1) # remove its index from the list of player card indices
+            cardObj.CommitList.append(cardObj.CommitCard) # add the card to list of previously played cards
+        elif self.chosenIndex == 0: # If player decided to go to market to pick a card
+            cardObj.goto_market(self) # call the method that does that in the card Object class
+            print(self.alias, "went to Market") # Tell the players that current player decided to visit the market
+        else: # if none of the conditions are met,
+            print("Your card is not acceptable. Commit a valid card | Press 0 to Go to Market") # Reject the card and prompt the user for another input
+            self.commit_card(cardObj) # rerun current method
+        return cardObj.CommitCard # return Commited Card
 
 
-class AIPlayer(Player):
+class AIPlayer(Player): # AI players special behavior and characteristics are defined here, it  inherits frfom Player class
     def __init__(self):
-        super().__init__()
+        super().__init__() # Inheritance in Python
         self.name = 'AI'
         self.alias = 'AI'
         self.playerCards = []
         self.playerCardsIndex = []
 
-    def ai_stack(self, cardObj):
+    def ai_stack(self, cardObj): # distributes cards to the ai players
         self.playerCards = self.create_stack(cardObj)
         self.playerCardsIndex = self.stack_index(cardObj)
-        #print(self.playerCards)
     
-    def ai_decision(self, cardObj):
-        random.shuffle(self.playerCards)
-        for j in self.playerCards:
-            self.chosenCard = j
-            self.cardDigit = self.check_for_digit(self.chosenCard)
-            self.commitDigit = self.check_for_digit(cardObj.CommitCard)
-            conditions = (cardObj.CommitCard[:4] == self.chosenCard[:4]) or (self.commitDigit == 20) or (self.cardDigit == self.commitDigit) or (self.cardDigit == 20)
-            if conditions:
-                cardObj.CommitCard = self.chosenCard
-                cardObj.CommitList.append(cardObj.CommitCard)
-                print(self.alias, "played", self.chosenCard)
-                self.playerCardsIndex.pop(self.playerCards.index(self.chosenCard))
-                self.playerCards.remove(self.chosenCard)
-                break
-        else:
-            cardObj.goto_market(self)
-            print(self.alias, "went to Market")
+    def ai_decision(self, cardObj): # The ai's logic for selecting the best card... No future prediction, just a simple thought process
+        random.shuffle(self.playerCards) # Shuffle ai's cards
+        for j in self.playerCards: # Run a test on all cards
+            self.chosenCard = j # The current chosen card
+            self.cardShape = self.check_for_shape(self.chosenCard) # Check for the shape of the ai's card 
+            self.commitShape = self.check_for_shape(cardObj.CommitCard) # Check for the shape of the last played card
+            self.cardDigit = self.check_for_digit(self.chosenCard) # Check for the digit of the ai's card
+            self.commitDigit = self.check_for_digit(cardObj.CommitCard) # Check for the digit of the last played card
+            conditions = (self.commitShape == self.cardShape) or (self.commitDigit == 20) or (self.cardDigit == self.commitDigit) or (self.cardDigit == 20) # conditions for validation
+            if conditions: # if condition is met
+                cardObj.CommitCard = self.chosenCard # Accept card
+                cardObj.CommitList.append(cardObj.CommitCard) # Add card to list of last played cards 
+                print(self.alias, "played", self.chosenCard) # Inform players about ai's choice
+                self.playerCardsIndex.pop(self.playerCards.index(self.chosenCard)) # Remove card index from list of ai cards indices 
+                self.playerCards.remove(self.chosenCard) # remove card from list of cards ai can play
+                break # stop looking for other acceptable cards
+        else: # If condition is not met
+            cardObj.goto_market(self) # ai should pick a card from market
+            print(self.alias, "went to Market") # Inform all about ai's decision to visit the market
         return cardObj.CommitCard
 
 
-class Gameplay:
+class Gameplay: # Game Manager
     def __init__(self):
         self.testcase = 0
         self.playerList = []
@@ -214,6 +215,7 @@ class Gameplay:
             if self.numOfaiPlayers <= 4:
                 self.numOfPlayers = 1 + self.numOfaiPlayers
             else:
+                print("...Try Again...")
                 self.num_ai()
             return self.numOfPlayers, self.numOfaiPlayers
 
@@ -224,7 +226,6 @@ class Gameplay:
         randomDieOutput = random.randint(0, (self.numOfaiPlayers))
         self.firstPlayerIndex = randomDieOutput
         print("First player is", self.newPlayerList[self.firstPlayerIndex].alias)
-        j = self.firstPlayerIndex
         return self.firstPlayerIndex
 
     def play(self, runIndex, cardObj):
@@ -295,7 +296,7 @@ class Gameplay:
         a4.alias = "AI_4"
 
         p1.create_profile()
-        p1Cards = self.playerList[0].player_stack(c)
+        self.playerList[0].player_stack(c)
 
         self.num_ai()
         for i in range(self.numOfaiPlayers):
