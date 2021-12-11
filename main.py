@@ -24,7 +24,7 @@ class Cards: # The card object is defined here
     def print_deck(self):
         print(self.deck)
     
-    def gen_market(self):
+    def generate_market(self):
         self.shape_name = ["Circles", "Cross", "Triangle", "Rectangle", "Star"] # An initialization of all the shape names
         for y in range(len(self.deck)):
             for z in self.deck[y]:
@@ -237,7 +237,7 @@ class Gameplay: # Game Manager
         self.play(runIndex, cardObj)
         self.card_test(runIndex, playerObj, cardObj)
         
-    def pick(self, runIndex, playerObj, cardObj, num):
+    def pick(self, playerObj, cardObj, num):
         if self.k == self.numOfaiPlayers:
             playerObj = self.newPlayerList[0]
         else:
@@ -246,15 +246,15 @@ class Gameplay: # Game Manager
         print(playerObj, "is gifted", num, "cards")
         for _ in range(num):
             cardObj.goto_market(playerObj)
-        self.skip(runIndex)
+        self.skip()
 
-    def pick_two(self, runIndex, playerObj, cardObj, num):
-        self.pick(runIndex, playerObj, cardObj, num)
+    def pick_two(self, playerObj, cardObj, num):
+        self.pick(playerObj, cardObj, num)
 
-    def pick_three(self, runIndex, playerObj, cardObj, num):
-        self.pick(runIndex, playerObj, cardObj, num)
+    def pick_three(self, playerObj, cardObj, num):
+        self.pick(playerObj, cardObj, num)
 
-    def skip(self, runIndex):
+    def skip(self):
         if self.k == self.numOfaiPlayers:
             self.k = 0
         else:
@@ -262,18 +262,29 @@ class Gameplay: # Game Manager
         print("---Skipped One Player---")
 
     def general_market(self, runIndex, playerObj, cardObj):
-        pass
+        print("...General Market... | All players are gifted a card except for current player")
+        while True:
+            if runIndex == self.numOfaiPlayers and  runIndex != self.k:
+                runIndex = 0
+            elif runIndex < self.numOfaiPlayers and  runIndex != self.k:
+                runIndex += 1
+            else:
+                break
+            playerObj = self.newPlayerList[runIndex]
+            cardObj.goto_market(playerObj)
+        self.play(runIndex, cardObj)
+        self.card_test(runIndex, playerObj, cardObj)   
 
     def card_test(self, runIndex, playerObj, cardObj):
         self.testcase = playerObj.check_for_digit(cardObj.CommitCard)
         if self.testcase == 1:
             self.hold_on(runIndex, playerObj, cardObj)
         elif self.testcase == 2:
-            self.pick_two(runIndex, playerObj, cardObj, 2)
+            self.pick_two(playerObj, cardObj, 2)
         elif self.testcase == 5:
-            self.pick_three(runIndex, playerObj, cardObj, 3)
+            self.pick_three(playerObj, cardObj, 3)
         elif self.testcase == 8:
-            self.skip(runIndex)
+            self.skip()
         elif self.testcase == 14:
             self.general_market(runIndex, playerObj, cardObj)
         else:
@@ -291,7 +302,7 @@ class Gameplay: # Game Manager
     def run(self):
         c = Cards()
         c.create_deck()
-        c.gen_market()
+        c.generate_market()
 
         p1 = Player()
         a1 = AIPlayer()
