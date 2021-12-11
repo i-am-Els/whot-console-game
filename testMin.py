@@ -1,7 +1,8 @@
-cardShape = ''
-for item in "cardor1":
-    if item.isalpha() == True:
-        cardShape += item
-        
-print(cardShape)
-    
+im = 2
+def into(indexIn):
+    indexIn = indexIn + 1
+    return indexIn
+
+im = into(im)
+
+print(im)

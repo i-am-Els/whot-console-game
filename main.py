@@ -90,7 +90,6 @@ class Player: # Defines the Players behaviors and characteristics
         self.cardShape = '' # The shape of the card that the player wants to commit 
         self.commitShape = '' # The shape of the card that is in commit 
 
-
     def create_profile(self): # creates a profile for the player
         self.name = input("Enter your alias(Avatar_name)>>> ") # Asks input for Human players choice name
         self.alias = self.name[0].upper() # Picks the first letter converts it to Uppercase and sets it as the alias
@@ -207,6 +206,7 @@ class Gameplay: # Game Manager
         self.firstPlayerIndex = 0
         self.winner = ''
         self.runGame = True
+        self.k = 0
 
     def num_ai(self):
             self.numOfaiPlayers = int(input("Choose Number of AI opponents | cannot be greater than 4>>> "))
@@ -233,16 +233,33 @@ class Gameplay: # Game Manager
             self.newPlayerList[runIndex].ai_decision(cardObj)  
 
     def hold_on(self, runIndex, playerObj, cardObj):
-        pass
-    
-    def pick_two(self, playerObj, cardObj):
-        pass
-    
-    def pick_three(self, playerObj, cardObj):
-        pass
+        print("Hold on Fella's...", playerObj, "has another chance to play")
+        self.play(runIndex, cardObj)
+        self.card_test(runIndex, playerObj, cardObj)
+        
+    def pick(self, runIndex, playerObj, cardObj, num):
+        if self.k == self.numOfaiPlayers:
+            playerObj = self.newPlayerList[0]
+        else:
+            playerObj = self.newPlayerList[self.k + 1]
 
-    def skip(self, runIndex, playerObj):
-        pass
+        print(playerObj, "is gifted", num, "cards")
+        for _ in range(num):
+            cardObj.goto_market(playerObj)
+        self.skip(runIndex)
+
+    def pick_two(self, runIndex, playerObj, cardObj, num):
+        self.pick(runIndex, playerObj, cardObj, num)
+
+    def pick_three(self, runIndex, playerObj, cardObj, num):
+        self.pick(runIndex, playerObj, cardObj, num)
+
+    def skip(self, runIndex):
+        if self.k == self.numOfaiPlayers:
+            self.k = 0
+        else:
+            self.k += 1
+        print("---Skipped One Player---")
 
     def general_market(self, runIndex, playerObj, cardObj):
         pass
@@ -252,11 +269,11 @@ class Gameplay: # Game Manager
         if self.testcase == 1:
             self.hold_on(runIndex, playerObj, cardObj)
         elif self.testcase == 2:
-            self.pick_two(playerObj, cardObj)
+            self.pick_two(runIndex, playerObj, cardObj, 2)
         elif self.testcase == 5:
-            self.pick_three(playerObj, cardObj)
+            self.pick_three(runIndex, playerObj, cardObj, 3)
         elif self.testcase == 8:
-            self.skip(runIndex, playerObj)
+            self.skip(runIndex)
         elif self.testcase == 14:
             self.general_market(runIndex, playerObj, cardObj)
         else:
@@ -300,15 +317,15 @@ class Gameplay: # Game Manager
 
         self.select_first_player(c)
 
-        k = self.firstPlayerIndex
+        self.k = self.firstPlayerIndex
         while (self.winner == '') and (self.runGame == True):
-            self.play(k, c)
-            self.card_test(k, self.newPlayerList[k], c)
-            self.winner_test(self.newPlayerList[k])
-            if k == self.numOfaiPlayers:
-                k = 0
+            self.play(self.k, c)
+            self.card_test(self.k, self.newPlayerList[self.k], c)
+            self.winner_test(self.newPlayerList[self.k])
+            if self.k == self.numOfaiPlayers:
+                self.k = 0
             else:
-                k += 1
+                self.k += 1
         
         print(f"There is a winner already!: {self.winner}")
         
