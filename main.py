@@ -129,6 +129,7 @@ class Player: # Defines the Players behaviors and characteristics
         return cardNum # return that integer
 
     def check_for_shape(self, cardName): # checks for the name of the shape in the card name
+        shape = ''
         for item in cardName: # in card name, loop through all characters
             if item.isalpha() == True: # if item is a string
                 shape += item # add item to shape e.g Star21 => 'S' + 't' + 'a' + 'r' = 'Star'
@@ -233,7 +234,7 @@ class Gameplay: # Game Manager
             self.newPlayerList[runIndex].ai_decision(cardObj)  
 
     def hold_on(self, runIndex, playerObj, cardObj):
-        print("Hold on Fella's...", playerObj, "has another chance to play")
+        print("Hold on Fella's...", playerObj.alias, "has another chance to play")
         self.play(runIndex, cardObj)
         self.card_test(runIndex, playerObj, cardObj)
         
