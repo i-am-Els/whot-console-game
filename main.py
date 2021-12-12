@@ -25,7 +25,7 @@ class Cards: # The card object is defined here
         print(self.deck)
     
     def generate_market(self):
-        self.shape_name = ["Circles", "Cross", "Triangle", "Rectangle", "Star"] # An initialization of all the shape names
+        self.shape_name = ["Circle", "Cross", "Triangle", "Rectangle", "Star"] # An initialization of all the shape names
         for y in range(len(self.deck)):
             for z in self.deck[y]:
                 self.market.append(self.shape_name[y] + str(z)) # This creates the list of all the cards with thee shape name appended to the beginning e.g Circle10
@@ -89,6 +89,7 @@ class Player: # Defines the Players behaviors and characteristics
         self.commitDigit = 0 # The digit of the card that is in commit
         self.cardShape = '' # The shape of the card that the player wants to commit 
         self.commitShape = '' # The shape of the card that is in commit 
+        self.cardEffectPeriod = 1
 
     def create_profile(self): # creates a profile for the player
         self.name = input("Enter your alias(Avatar_name)>>> ") # Asks input for Human players choice name
@@ -154,7 +155,10 @@ class Player: # Defines the Players behaviors and characteristics
             self.playerCards.pop(self.chosenIndex - 1) # Upon accepting the card from the user, remove it from the list of cards the player can play
             self.playerCardsIndex.pop(self.chosenIndex - 1) # remove its index from the list of player card indices
             cardObj.CommitList.append(cardObj.CommitCard) # add the card to list of previously played cards
+            if self.cardDigit == 1 or self.cardDigit == 2 or self.cardDigit == 5 or self.cardDigit == 8 or self.cardDigit == 14 :
+                self.cardEffectPeriod = 1
         elif self.chosenIndex == 0: # If player decided to go to market to pick a card
+            self.cardEffectPeriod = 0
             cardObj.goto_market(self) # call the method that does that in the card Object class
             print(self.alias, "went to Market") # Tell the players that current player decided to visit the market
         else: # if none of the conditions are met,
@@ -170,6 +174,7 @@ class AIPlayer(Player): # AI players special behavior and characteristics are de
         self.alias = 'AI'
         self.playerCards = []
         self.playerCardsIndex = []
+        self.cardEffectPeriod = 1
 
     def ai_stack(self, cardObj): # distributes cards to the ai players
         self.playerCards = self.create_stack(cardObj)
@@ -187,11 +192,14 @@ class AIPlayer(Player): # AI players special behavior and characteristics are de
             if conditions: # if condition is met
                 cardObj.CommitCard = self.chosenCard # Accept card
                 cardObj.CommitList.append(cardObj.CommitCard) # Add card to list of last played cards 
+                if self.cardDigit == 1 or self.cardDigit == 2 or self.cardDigit == 5 or self.cardDigit == 8 or self.cardDigit == 14 :
+                    self.cardEffectPeriod = 1
                 print(self.alias, "played", self.chosenCard) # Inform players about ai's choice
                 self.playerCardsIndex.pop(self.playerCards.index(self.chosenCard)) # Remove card index from list of ai cards indices 
                 self.playerCards.remove(self.chosenCard) # remove card from list of cards ai can play
                 break # stop looking for other acceptable cards
         else: # If condition is not met
+            self.cardEffectPeriod = 0
             cardObj.goto_market(self) # ai should pick a card from market
             print(self.alias, "went to Market") # Inform all about ai's decision to visit the market
         return cardObj.CommitCard
@@ -244,9 +252,13 @@ class Gameplay: # Game Manager
         else:
             playerObj = self.newPlayerList[self.k + 1]
 
-        print(playerObj, "is gifted", num, "cards")
+        print(playerObj.playerCards)
+
+        print(playerObj.alias, "is gifted", num, "cards")
         for _ in range(num):
             cardObj.goto_market(playerObj)
+
+        print(playerObj.playerCards)
         self.skip()
 
     def pick_two(self, playerObj, cardObj, num):
@@ -264,32 +276,41 @@ class Gameplay: # Game Manager
 
     def general_market(self, runIndex, playerObj, cardObj):
         print("...General Market... | All players are gifted a card except for current player")
-        while True:
-            if runIndex == self.numOfaiPlayers and  runIndex != self.k:
+        counter = 0
+        while counter < self.numOfaiPlayers:
+            if (runIndex == self.numOfaiPlayers):
                 runIndex = 0
-            elif runIndex < self.numOfaiPlayers and  runIndex != self.k:
+            elif (runIndex < self.numOfaiPlayers):
                 runIndex += 1
+            if runIndex != self.k: 
+                playerObj = self.newPlayerList[runIndex]
+                print(playerObj.playerCards)
+                cardObj.goto_market(playerObj)
+                print(playerObj.playerCards)
             else:
                 break
-            playerObj = self.newPlayerList[runIndex]
-            cardObj.goto_market(playerObj)
+            counter += 1
+
+        runIndex = self.k
         self.play(runIndex, cardObj)
         self.card_test(runIndex, playerObj, cardObj)   
 
     def card_test(self, runIndex, playerObj, cardObj):
         self.testcase = playerObj.check_for_digit(cardObj.CommitCard)
-        if self.testcase == 1:
-            self.hold_on(runIndex, playerObj, cardObj)
-        elif self.testcase == 2:
-            self.pick_two(playerObj, cardObj, 2)
-        elif self.testcase == 5:
-            self.pick_three(playerObj, cardObj, 3)
-        elif self.testcase == 8:
-            self.skip()
-        elif self.testcase == 14:
-            self.general_market(runIndex, playerObj, cardObj)
-        else:
-            pass        
+        if playerObj.cardEffectPeriod != 0:
+            playerObj.cardEffectPeriod = 0
+            if self.testcase == 1:
+                self.hold_on(runIndex, playerObj, cardObj)
+            elif self.testcase == 2:
+                self.pick_two(playerObj, cardObj, 2)
+            elif self.testcase == 5:
+                self.pick_three(playerObj, cardObj, 3)
+            elif self.testcase == 8:
+                self.skip()
+            elif self.testcase == 14:
+                self.general_market(runIndex, playerObj, cardObj)
+            else:
+                pass        
 
     def winner_test(self, playerObj):
         if len(playerObj.playerCards) == 0:
@@ -297,7 +318,7 @@ class Gameplay: # Game Manager
             self.runGame = False
             print(self.winner, "is the Champion!!!")
         elif len(playerObj.playerCards) == 1:
-            print(playerObj.alias, "has one more card left")
+            print("Alert!!! =>",playerObj.alias, "has one more card left")
         return self.winner, self.runGame
 
     def run(self):

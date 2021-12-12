@@ -1,8 +1,6 @@
-im = 2
-def into(indexIn):
-    indexIn = indexIn + 1
-    return indexIn
-
-im = into(im)
-
-print(im)
+m = 2
+for j in range(6):
+    if j < 3:
+        print(j)
+else:
+    print(m)
