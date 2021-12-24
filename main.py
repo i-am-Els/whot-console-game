@@ -25,7 +25,7 @@ class Cards: # The card object is defined here
         print(self.deck)
     
     def generate_market(self):
-        self.shape_name = ["Circle", "Cross", "Triangle", "Rectangle", "Star"] # An initialization of all the shape names
+        self.shape_name = ["Circle", "Cross", "Triangle", "Square", "Star"] # An initialization of all the shape names
         for y in range(len(self.deck)):
             for z in self.deck[y]:
                 self.market.append(self.shape_name[y] + str(z)) # This creates the list of all the cards with thee shape name appended to the beginning e.g Circle10
