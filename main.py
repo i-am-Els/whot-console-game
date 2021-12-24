@@ -55,6 +55,7 @@ class Cards: # The card object is defined here
                 testSum = gameObj.newPlayerList[i].check_for_digit(j) # Pick the numeric values from all the cards
                 add += testSum # sum those numeric values
             lenOfCards.append(add) # store the numeric sums of cards for all players in List called lenOfCards 
+            add = 0
         
         smallest = lenOfCards[0] # Set the first element of the list as the smallest
         j = len(lenOfCards) 
@@ -64,6 +65,7 @@ class Cards: # The card object is defined here
         smallestIndex = lenOfCards.index(smallest) # Select the index of the overall smallest element and store in smallestIndex
         
         print("Ran out of market, Winner upon tender is", gameObj.newPlayerList[smallestIndex].alias) # Declare the winner upon tender
+        print(">>> ", gameObj.newPlayerList[smallestIndex].alias, "won because It has the smallest sum of cards")
         raise SystemExit("The End... Quiting game!!!") # quit the game
 
     def goto_market(self, playerObj): # An option for player to pick a card if non of its cards matches commit. 
@@ -218,14 +220,15 @@ class Gameplay: # Game Manager
         self.k = 0
 
     def num_ai(self):
-            self.numOfaiPlayers = int(input("Choose Number of AI opponents | cannot be greater than 4>>> "))
-            if self.numOfaiPlayers <= 4:
-                self.numOfPlayers = 1 + self.numOfaiPlayers
-            else:
-                print("...Try Again...")
-                self.num_ai()
-            return self.numOfPlayers, self.numOfaiPlayers
-
+            self.numOfaiPlayers = int(input("Choose Number of AI opponents >>> "))
+            self.numOfPlayers = 1 + self.numOfaiPlayers
+            
+            for i in range(self.numOfaiPlayers):
+                ai = AIPlayer()
+                self.playerList.append(ai)
+                j = i + 1
+                ai.alias = f"AI_{j}"
+            
     def select_first_player(self, cardObj):
         print("The Default commited card is", cardObj.CommitCard)
         for i in range(self.numOfPlayers):
@@ -322,15 +325,7 @@ class Gameplay: # Game Manager
         c.generate_market()
 
         p1 = Player()
-        a1 = AIPlayer()
-        a2 = AIPlayer()
-        a3 = AIPlayer()
-        a4 = AIPlayer()
-        self.playerList = [p1, a1, a2, a3, a4]
-        a1.alias = "AI_1"
-        a2.alias = "AI_2"
-        a3.alias = "AI_3"
-        a4.alias = "AI_4"
+        self.playerList.append(p1)
 
         p1.create_profile()
         self.playerList[0].player_stack(c)
@@ -346,6 +341,7 @@ class Gameplay: # Game Manager
         self.select_first_player(c)
 
         self.k = self.firstPlayerIndex
+
         while (self.winner == '') and (self.runGame == True):
             self.play(self.k, c)
             self.card_test(self.k, self.newPlayerList[self.k], c)
