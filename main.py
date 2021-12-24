@@ -252,13 +252,10 @@ class Gameplay: # Game Manager
         else:
             playerObj = self.newPlayerList[self.k + 1]
 
-        print(playerObj.playerCards)
-
         print(playerObj.alias, "is gifted", num, "cards")
         for _ in range(num):
             cardObj.goto_market(playerObj)
 
-        print(playerObj.playerCards)
         self.skip()
 
     def pick_two(self, playerObj, cardObj, num):
@@ -284,9 +281,7 @@ class Gameplay: # Game Manager
                 runIndex += 1
             if runIndex != self.k: 
                 playerObj = self.newPlayerList[runIndex]
-                print(playerObj.playerCards)
                 cardObj.goto_market(playerObj)
-                print(playerObj.playerCards)
             else:
                 break
             counter += 1
